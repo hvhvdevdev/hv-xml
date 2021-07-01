@@ -1,0 +1,13 @@
+[package]
+name = "hv-xml"
+description = "A library for reading a subset of XML into a tree."
+keywords = ["xml", "parse", "tree"]
+version = "0.1.0"
+edition = "2018"
+repository = "https://github.com/hvhvdevdev/hv-xml"
+authors = ["Hai <hvhvdevdev@pm.me>"]
+license = "MIT"
+categories = ["no-std"]
+readme = "./README.md"
+
+[dependencies]
