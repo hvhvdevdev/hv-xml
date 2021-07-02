@@ -109,6 +109,19 @@ mod tests {
     }
 
     #[test]
+    fn with_body() {
+        let n = Node::read("<xml>Ahihi</xml>");
+        assert_eq!(n.unwrap().name, "xml")
+    }
+
+    #[test]
+    fn with_hard_body() {
+        let n = Node::read("<xml><xml></xml>");
+        assert_eq!(n.is_none(), true)
+    }
+
+
+    #[test]
     fn wrong_closing() {
         let n = Node::read("<xml></Xml>");
         assert_eq!(n.is_none(), true)
