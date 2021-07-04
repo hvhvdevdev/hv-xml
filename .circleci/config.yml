@@ -22,7 +22,6 @@ jobs:
           key: v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
       - run:
           cargo test -- -Z unstable-options --format json | cargo2junit > test-results results.xml
-      - run: mkdir test-results; mv results.xml test-results
       - store_test_results:
           path: test-results
 
