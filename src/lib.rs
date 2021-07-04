@@ -117,7 +117,7 @@ mod tests {
     #[test]
     fn with_hard_body() {
         let n = Node::read("<xml><xml></xml>");
-        assert_eq!(n.is_none(), true)
+        assert!(n.is_none())
     }
 
 
