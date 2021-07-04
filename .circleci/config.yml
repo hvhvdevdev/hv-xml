@@ -8,6 +8,7 @@ jobs:
       - checkout
       - run: rustc --version; cargo --version; rustup --version
       - run: cargo generate-lockfile
+      - run: cargo install cargo-junit
       - restore_cache:
           keys:
             - v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
@@ -19,4 +20,9 @@ jobs:
             - target/debug/build
             - target/debug/deps
           key: v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
-      - run: cargo test --all
+      - run:
+          cargo junit --name results.xml
+      - run: mkdir test-results; mv results.xml test-results
+      - store_test_results:
+          path: test-results
+
