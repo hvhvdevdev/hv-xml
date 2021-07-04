@@ -1,8 +1,22 @@
 version: 2.1
 jobs:
-  build:
+  test:
     docker:
       - image: cimg/rust:1.53.0
+    resource_class: small
     steps:
       - checkout
-      - run: cargo test
+      - run: rustc --version; cargo --version; rustup --version
+      - run: cargo generate-lockfile
+      - restore_cache:
+          keys:
+            - v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
+      - run: cargo build --all --all-targets
+      - save_cache:
+          paths:
+            - /usr/local/cargo/registry
+            - target/debug/.fingerprint
+            - target/debug/build
+            - target/debug/deps
+          key: v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
+      - run: cargo test --all
