@@ -98,11 +98,6 @@ mod tests {
     use crate::Node;
 
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-
-    #[test]
     fn simple() {
         let n = Node::read("<xml></xml>");
         assert_eq!(n.unwrap().name, "xml")
@@ -124,18 +119,24 @@ mod tests {
     #[test]
     fn wrong_closing() {
         let n = Node::read("<xml></Xml>");
-        assert_eq!(n.is_none(), true)
+        assert!(n.is_none())
     }
 
     #[test]
     fn no_slash() {
         let n = Node::read("<xml><xml>");
-        assert_eq!(n.is_none(), true)
+        assert!(n.is_none())
     }
 
     #[test]
     fn no_open() {
         let n = Node::read("xml><xml>");
-        assert_eq!(n.is_none(), true)
+        assert!(n.is_none())
+    }
+
+    #[test]
+    fn only_close() {
+        let n = Node::read("<xml>");
+        assert!(n.is_none())
     }
 }
