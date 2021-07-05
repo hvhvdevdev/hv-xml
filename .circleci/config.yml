@@ -24,8 +24,6 @@ jobs:
           mkdir test-results
       - run:
           cargo test -- -Z unstable-options --format json | cargo2junit > test-results/results.xml
-      - store_artifacts:
-          path: test-results
       - store_test_results:
           path: test-results
 
