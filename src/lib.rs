@@ -104,6 +104,12 @@ mod tests {
     }
 
     #[test]
+    fn simple_salt() {
+        let n = Node::read("aaa<xml></xml>");
+        assert_eq!(n.unwrap().name, "xml")
+    }
+
+    #[test]
     fn with_body() {
         let n = Node::read("<xml>Ahihi</xml>");
         assert_eq!(n.unwrap().name, "xml")
