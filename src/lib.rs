@@ -99,10 +99,10 @@ impl<'a> Node<'a> {
 }
 
 impl<'a> Iterator for Node<'a> {
-    type Item = ();
+    type Item = Node<'a>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        unimplemented!()
+        Node::read(self.after)
     }
 }
 
@@ -180,5 +180,12 @@ mod tests {
     fn only_close() {
         let n = Node::read("<xml>");
         assert!(n.is_none())
+    }
+
+    #[test]
+    fn sister() {
+        let n = Node::read("<alice>Alice</alice><maria></maria>");
+        let n2 = n.unwrap().next();
+        assert_eq!(n2.unwrap().name, "maria");
     }
 }
