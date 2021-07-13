@@ -1,10 +1,6 @@
 #![no_std]
-extern crate alloc;
 
-use alloc::string::String;
-use alloc::vec::Vec;
-use alloc::vec;
-use crate::ReaderState::{LookingForClosingTagClose, LookingForRootOpen, LookingForRootClose, LookingForClosingTagOpen, LookingForClosingTagSlash};
+use core::slice::Iter;
 
 #[derive(Debug)]
 pub struct Attribute<'a> {
@@ -16,16 +12,8 @@ pub struct Attribute<'a> {
 pub struct Node<'a> {
     pub name: &'a str,
     pub body: &'a str,
-    end: usize,
-    opener_pos: (usize, usize),
-}
-
-enum ReaderState {
-    LookingForRootOpen,
-    LookingForRootClose,
-    LookingForClosingTagOpen,
-    LookingForClosingTagSlash,
-    LookingForClosingTagClose,
+    after: &'a str,
+    opener: &'a str,
 }
 
 fn is_space(c: char) -> bool {
@@ -96,7 +84,7 @@ impl<'a> Node<'a> {
             if get_tag_name(source, pos) == opener_name {
                 if source.chars().nth(pos.0).unwrap() == '/' {
                     if nest == 0 {
-                        return Some(Node { end: pos.1, opener_pos, body: &source[opener_pos.1..pos.0], name: opener_name });
+                        return Some(Node { after: &source[pos.1..], opener: &source[opener_pos.0..opener_pos.1], body: &source[opener_pos.1..pos.0], name: opener_name });
                     } else {
                         nest = nest - 1;
                     }
@@ -107,6 +95,14 @@ impl<'a> Node<'a> {
 
             current_pos = pos.1;
         }
+    }
+}
+
+impl<'a> Iterator for Node<'a> {
+    type Item = ();
+
+    fn next(&mut self) -> Option<Self::Item> {
+        unimplemented!()
     }
 }
 
