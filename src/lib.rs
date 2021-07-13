@@ -31,6 +31,12 @@ fn is_space(c: char) -> bool {
     c == ' ' || c == '\t' || c == '\n' || c == '\r'
 }
 
+fn count_until(s: &str, c: char) -> usize {
+    let mut n: usize = 0;
+
+    if s.chars().nth(0).unwrap() == c { 0 } else { 1 + count_until(&s[1..], c) }
+}
+
 impl<'a> Node<'a> {
     pub fn read(source: &'a str) -> Option<Node<'a>> {
         let mut root_open_pos: Option<usize> = None;
