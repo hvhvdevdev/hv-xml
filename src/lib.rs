@@ -16,7 +16,8 @@ pub struct Attribute<'a> {
 pub struct Node<'a> {
     pub name: &'a str,
     pub body: &'a str,
-    pub attributes: Vec<Attribute<'a>>,
+    end: usize,
+    opener_pos: (usize, usize),
 }
 
 enum ReaderState {
@@ -75,62 +76,36 @@ fn get_tag_name(s: &str, pos: (usize, usize)) -> &str {
 
 impl<'a> Node<'a> {
     pub fn read(source: &'a str) -> Option<Node<'a>> {
-        let mut root_open_pos: Option<usize> = None;
-        let mut root_close_pos: Option<usize> = None;
-        let mut state = ReaderState::LookingForRootOpen;
+        let opener_pos = if let Some(pos) = get_tag_pos(source) {
+            pos
+        } else {
+            return None;
+        };
 
-        // Find the location of Root opening element.
-        for i in 0..source.len() {
-            match state {
-                ReaderState::LookingForRootOpen => if source.chars().nth(i).unwrap() == '<' {
-                    root_open_pos = Some(i);
-                    state = LookingForRootClose;
+        let opener_name = get_tag_name(source, opener_pos);
+        let mut nest = 0usize;
+        let mut current_pos = opener_pos.1;
+
+        loop {
+            let pos = if let Some(p) = get_tag_pos(&source[current_pos..]) {
+                (p.0 + current_pos, p.1 + current_pos)
+            } else {
+                return None;
+            };
+
+            if get_tag_name(source, pos) == opener_name {
+                if source.chars().nth(pos.0).unwrap() == '/' {
+                    if nest == 0 {
+                        return Some(Node { end: pos.1, opener_pos, body: &source[opener_pos.1..pos.0], name: opener_name });
+                    } else {
+                        nest = nest - 1;
+                    }
+                } else {
+                    nest = nest + 1;
                 }
-                ReaderState::LookingForRootClose => if source.chars().nth(i).unwrap() == '>' {
-                    root_close_pos = Some(i);
-                    state = LookingForClosingTagClose;
-                    break;
-                }
-                _ => return None
             }
-        }
-        // Find the location of the closing element.
-        let mut closing_open_pos: Option<usize> = None;
-        let mut closing_close_pos: Option<usize> = None;
-        let mut closing_slash_pos: Option<usize> = None;
 
-        for i in (0..source.len()).rev() {
-            match state {
-                ReaderState::LookingForClosingTagClose => if source.chars().nth(i).unwrap() == '>' {
-                    closing_close_pos = Some(i);
-                    state = LookingForClosingTagSlash
-                }
-                ReaderState::LookingForClosingTagSlash => if source.chars().nth(i).unwrap() == '/' {
-                    closing_slash_pos = Some(i);
-                    state = LookingForClosingTagOpen
-                }
-                ReaderState::LookingForClosingTagOpen => if source.chars().nth(i).unwrap() == '<' {
-                    closing_open_pos = Some(i);
-                    break;
-                }
-                _ => return None
-            }
-        }
-
-        match (root_open_pos, root_close_pos, closing_open_pos, closing_slash_pos, closing_close_pos) {
-            // Different opening and closing tags...
-            (Some(root_open_pos), Some(root_close_pos), Some(_), Some(closing_slash_pos), Some(closing_close_pos))
-            if &source[root_open_pos + 1..root_close_pos] != &source[closing_slash_pos + 1..closing_close_pos] => None,
-            // Okay.
-            (Some(root_open_pos), Some(root_close_pos), Some(closing_open_pos), Some(_), Some(_)) =>
-                Some(Node
-                {
-                    name: &source[root_open_pos + 1..root_close_pos],
-                    body: &source[root_close_pos + 1..closing_open_pos],
-                    attributes: vec![],
-                }),
-            // Couldn't get the positions?
-            (_, _, _, _, _) => None
+            current_pos = pos.1;
         }
     }
 }
