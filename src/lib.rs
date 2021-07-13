@@ -61,7 +61,7 @@ fn get_tag_pos(s: &str) -> Option<(usize, usize)> {
 }
 
 fn get_tag_name(s: &str, pos: (usize, usize)) -> &str {
-    let start = if s.chars().nth(0).unwrap() == '/' {
+    let start = if s.chars().nth(pos.0).unwrap() == '/' {
         1
     } else {
         0
@@ -148,7 +148,8 @@ mod tests {
 
     #[test]
     fn get_tag() {
-        assert_eq!(crate::get_tag_pos(" <Hello>"), Some((2, 7)))
+        assert_eq!(crate::get_tag_pos(" <Hello>"), Some((2, 7)));
+        assert_eq!(crate::get_tag_pos(" </Hello>"), Some((2, 8)));
     }
 
     #[test]
@@ -156,8 +157,9 @@ mod tests {
         let s1 = "   <xml>";
         let s2 = "   </xml>";
         let pos1 = crate::get_tag_pos(s1).unwrap();
-        assert_eq!(pos1, (4, 7));
+        let pos2 = crate::get_tag_pos(s2).unwrap();
         assert_eq!(crate::get_tag_name(s1, pos1), "xml");
+        assert_eq!(crate::get_tag_name(s2, pos2), "xml");
     }
 
     #[test]
