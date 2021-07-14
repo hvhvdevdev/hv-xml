@@ -2,13 +2,7 @@
 
 use core::slice::Iter;
 
-#[derive(Debug)]
-pub struct Attribute<'a> {
-    pub name: &'a str,
-    pub str_value: &'a str,
-}
-
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Node<'a> {
     pub name: &'a str,
     pub body: &'a str,
@@ -187,5 +181,15 @@ mod tests {
         let n = Node::read("<alice>Alice</alice><maria></maria>");
         let n2 = n.unwrap().next();
         assert_eq!(n2.unwrap().name, "maria");
+    }
+
+    #[test]
+    fn sister_daughter() {
+        let n = Node::read("<mama><alice>Alice</alice><maria></maria></mama>");
+        assert_eq!(n.unwrap().name, "mama");
+        let n = Node::read(n.unwrap().body);
+        assert_eq!(n.unwrap().name, "alice");
+        let n = n.unwrap().next();
+        assert_eq!(n.unwrap().name, "maria");
     }
 }
