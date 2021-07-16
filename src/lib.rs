@@ -1,6 +1,7 @@
 #![no_std]
 
 use core::slice::Iter;
+use core::ops::Index;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Node<'a> {
@@ -100,6 +101,15 @@ impl<'a> Iterator for Node<'a> {
     }
 }
 
+impl<'a> Index<&str> for Node<'a> {
+    type Output = Option<&'a str>;
+
+    fn index(&self, index: &str) -> &Self::Output {
+        todo!()
+    }
+}
+
+
 #[cfg(test)]
 mod tests {
     use crate::Node;
@@ -195,11 +205,17 @@ mod tests {
 
     #[test]
     fn nest() {
-        let n = Node::read("   <Foo><Foo></Foo></Foo>  ");
+        let n = Node::read("   <Foo name=foo><Foo></Foo></Foo>  ");
         assert_eq!(n.unwrap().name, "Foo");
         let n = Node::read(n.unwrap().body);
         assert_eq!(n.unwrap().name, "Foo");
         let n = Node::read(n.unwrap().body);
         assert!(n.is_none());
+    }
+
+    #[test]
+    fn attr() {
+        let n = Node::read("   <Foo name=foo></Foo>  ");
+        assert_eq!(n.unwrap()["name"].unwrap(), "foo");
     }
 }
