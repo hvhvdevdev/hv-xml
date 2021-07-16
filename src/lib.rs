@@ -129,7 +129,7 @@ mod tests {
 
     #[test]
     fn get_tag_name() {
-        let s1 = "   <xml>";
+        let s1 = "   <xml v=1>";
         let s2 = "   </xml>";
         let pos1 = crate::get_tag_pos(s1).unwrap();
         let pos2 = crate::get_tag_pos(s2).unwrap();
