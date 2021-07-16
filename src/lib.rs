@@ -192,4 +192,14 @@ mod tests {
         let n = n.unwrap().next();
         assert_eq!(n.unwrap().name, "maria");
     }
+
+    #[test]
+    fn nest() {
+        let n = Node::read("   <Foo><Foo></Foo></Foo>  ");
+        assert_eq!(n.unwrap().name, "Foo");
+        let n = Node::read(n.unwrap().body);
+        assert_eq!(n.unwrap().name, "Foo");
+        let n = Node::read(n.unwrap().body);
+        assert!(n.is_none());
+    }
 }
