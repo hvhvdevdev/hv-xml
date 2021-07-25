@@ -1,6 +1,6 @@
 version: 2.1
 jobs:
-  build:
+  build-and-test:
     docker:
       - image: cimg/rust:1.53.0
     resource_class: small
@@ -26,4 +26,7 @@ jobs:
           cargo test -- -Z unstable-options --format json | cargo2junit > test-results/results.xml
       - store_test_results:
           path: test-results
-
+workflows:
+  build-and-test:
+    jobs: 
+      - build-and-test
